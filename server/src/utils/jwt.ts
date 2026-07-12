@@ -1,7 +1,7 @@
-import jwt, { type JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import { AppError } from "./AppError.js"
-import { HTTP_STATUS } from "../constants/constants.js"
+import { HTTP_STATUS, type JwtPayload } from "../constants/constants.js"
 
 dotenv.config()
 

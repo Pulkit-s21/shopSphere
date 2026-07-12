@@ -1,9 +1,13 @@
-import type { Request, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express"
 import { AppError } from "../utils/AppError.js"
 import { HTTP_STATUS } from "../constants/constants.js"
 import { verifyToken } from "../utils/jwt.js"
 
-export const authMiddleware = (req: Request, next: NextFunction) => {
+export const authMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const authHeader = req.headers.authorization // get header
 
   if (!authHeader) {

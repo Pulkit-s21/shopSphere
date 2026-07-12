@@ -1,5 +1,9 @@
 import { HTTP_STATUS } from "../constants/constants.js"
-import { loginUser, registerUser } from "../services/auth.service.js"
+import {
+  getCurrentUser,
+  loginUser,
+  registerUser,
+} from "../services/auth.service.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const registerUserController = asyncHandler(async (req, res) => {
@@ -14,6 +18,12 @@ export const loginUserController = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
   const user = await loginUser(email, password)
+
+  return res.status(HTTP_STATUS.OK).json(user)
+})
+
+export const getCurrentUserController = asyncHandler(async (req, res) => {
+  const user = await getCurrentUser(req.userId!)
 
   return res.status(HTTP_STATUS.OK).json(user)
 })
