@@ -3,7 +3,7 @@ import { prisma } from "../config/prisma.js"
 export const findByEmail = async (email: string) => {
   return prisma.user.findUnique({
     where: { email },
-    select: { email: true, password: true },
+    select: { id: true, name: true, email: true, password: true },
   })
 }
 

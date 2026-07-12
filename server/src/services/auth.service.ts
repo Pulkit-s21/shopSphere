@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import { createUser, findByEmail } from "../repositories/user.repository.js"
 import { AppError } from "../utils/AppError.js"
 import { HTTP_STATUS } from "../constants/constants.js"
+import { generateAccessToken } from "../utils/jwt.js"
 
 export const registerUser = async (
   name: string,
@@ -25,9 +26,18 @@ export const loginUser = async (email: string, password: string) => {
 
   if (!user) throw new AppError("User not found", HTTP_STATUS.NOT_FOUND)
 
-  const isValid = await bcrypt.compare(user.password, password)
+  const isValid = await bcrypt.compare(password, user.password)
 
-  if (!isValid) throw new Error("Incorrect Password")
+  if (!isValid) throw new AppError("Incorrect Password", HTTP_STATUS.FORBIDDEN)
 
-  return user
+  const accessToken = generateAccessToken(user.id)
+
+  return {
+    accessToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  }
 }
