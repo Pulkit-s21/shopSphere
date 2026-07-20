@@ -46,7 +46,7 @@ export const refreshTokenController = asyncHandler(async (req, res) => {
     throw new AppError("Refresh token missing", HTTP_STATUS.NOT_FOUND)
 
   // verify token
-  const decoded = verifyRefreshToken(refreshCookie)
+  const decoded = verifyRefreshToken(refreshCookie.refreshToken)
 
   // generate new token
   const accessToken = generateAccessToken(decoded.userId!)
