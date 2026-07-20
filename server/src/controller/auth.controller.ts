@@ -61,4 +61,6 @@ export const logoutController = asyncHandler(async (req, res) => {
   res.clearCookie("accessToken", accessCookieConfig)
 
   res.clearCookie("refreshToken", refreshCookieConfig)
+
+  return res.status(HTTP_STATUS.OK).json({ message: "Logged out successfully" })
 })
