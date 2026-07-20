@@ -23,7 +23,7 @@ model Product {
   name        String
   description String
 
-  price       Decimal
+  price       Decimal @db.Decimal(10,2)
 
   stock       Int
 
