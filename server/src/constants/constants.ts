@@ -1,3 +1,5 @@
+import type { CookieOptions } from "express"
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -13,4 +15,18 @@ export const HTTP_STATUS = {
 
 export interface JwtPayload {
   userId: string
+}
+
+export const accessCookieConfig: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 15 * 60 * 1000,
+}
+
+export const refreshCookieConfig: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 }

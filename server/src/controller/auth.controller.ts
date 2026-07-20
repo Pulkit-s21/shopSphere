@@ -1,4 +1,8 @@
-import { HTTP_STATUS } from "../constants/constants.js"
+import {
+  accessCookieConfig,
+  HTTP_STATUS,
+  refreshCookieConfig,
+} from "../constants/constants.js"
 import {
   getCurrentUser,
   loginUser,
@@ -21,19 +25,9 @@ export const loginUserController = asyncHandler(async (req, res) => {
 
   const accessToken = await loginUser(email, password)
 
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 15 * 60 * 1000, // 15 mins
-  })
+  res.cookie("accessToken", accessToken, accessCookieConfig)
 
-  res.cookie("refreshToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  })
+  res.cookie("refreshToken", accessToken, refreshCookieConfig)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Login successful" })
 })
@@ -58,12 +52,13 @@ export const refreshTokenController = asyncHandler(async (req, res) => {
   const accessToken = generateAccessToken(decoded.userId!)
 
   // set new token
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 15 * 60 * 1000, // 15 mins
-  })
+  res.cookie("accessToken", accessToken, accessCookieConfig)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Access token refreshed" })
+})
+
+export const logoutController = asyncHandler(async (req, res) => {
+  res.clearCookie("accessToken", accessCookieConfig)
+
+  res.clearCookie("refreshToken", refreshCookieConfig)
 })
