@@ -17,9 +17,16 @@ export const registerUserController = asyncHandler(async (req, res) => {
 export const loginUserController = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  const user = await loginUser(email, password)
+  const accessToken = await loginUser(email, password)
 
-  return res.status(HTTP_STATUS.OK).json(user)
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 15 * 60 * 1000, // 15 mins
+  })
+
+  return res.status(HTTP_STATUS.OK).json({ message: "Login successful" })
 })
 
 export const getCurrentUserController = asyncHandler(async (req, res) => {
