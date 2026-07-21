@@ -14,7 +14,7 @@ export const authMiddleware = (
     throw new AppError("Authentication required", HTTP_STATUS.UNAUTHORIZED)
   }
 
-  const decoded = verifyToken(token.accessToken)
+  const decoded = verifyToken(token)
 
   req.userId = decoded.userId
 

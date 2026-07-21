@@ -5,6 +5,7 @@ import {
   findByDetails,
   findById,
   getProducts,
+  updateProduct,
 } from "../repositories/product.repository.js"
 import { AppError } from "../utils/AppError.js"
 
@@ -13,20 +14,18 @@ export const addProduct = async (
   description: string,
   price: number,
   stock: number,
-  imgUrl: string,
+  imageUrl: string,
 ) => {
   const existingProduct = await findByDetails(name, description)
 
   if (existingProduct)
     throw new AppError("Product already exists", HTTP_STATUS.CONFLICT)
 
-  return await createProduct(name, description, price, stock, imgUrl)
+  return await createProduct(name, description, price, stock, imageUrl)
 }
 
 export const getProductById = async (id: string) => {
-  const product = await findById(id)
-
-  return product
+  return await findById(id)
 }
 
 export const deleteProductById = async (id: string) => {
@@ -37,6 +36,22 @@ export const deleteProductById = async (id: string) => {
   return await deleteProduct(id)
 }
 
-export const getAllProducts = async () => {
-  return await getProducts()
+export const getAllProducts = async (page: number, limit: number) => {
+  return await getProducts(page, limit)
+}
+
+export const editProductById = async (
+  id: string,
+  name: string,
+  description: string,
+  price: number,
+  stock: number,
+  imageUrl: string,
+) => {
+  const existingProduct = await findById(id)
+
+  if (!existingProduct)
+    throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
+
+  return await updateProduct(id, name, description, price, stock, imageUrl)
 }

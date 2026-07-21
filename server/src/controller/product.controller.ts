@@ -1,14 +1,20 @@
 import { HTTP_STATUS } from "../constants/constants.js"
-import { deleteProduct } from "../repositories/product.repository.js"
 import {
   addProduct,
+  deleteProductById,
+  editProductById,
   getAllProducts,
   getProductById,
 } from "../services/product.service.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const getAllProductsController = asyncHandler(async (req, res) => {
-  const products = await getAllProducts()
+  const { page, limit } = req.query
+
+  const pageNumber = Number(page) || 0
+  const limitNumber = Number(limit) || 0
+
+  const products = await getAllProducts(pageNumber, limitNumber)
 
   return res.status(HTTP_STATUS.OK).json({ message: "All Products", products })
 })
@@ -22,17 +28,34 @@ export const getProductByIdController = asyncHandler(async (req, res) => {
 })
 
 export const addProductController = asyncHandler(async (req, res) => {
-  const { name, description, price, stock, imgUrl } = req.body
+  const { name, description, price, stock, imageUrl } = req.body
 
-  await addProduct(name, description, price, stock, imgUrl)
+  await addProduct(name, description, price, stock, imageUrl)
 
   return res.status(HTTP_STATUS.CREATED).json({ message: "Product created" })
 })
 
 export const deleteProductByIdController = asyncHandler(async (req, res) => {
-  const { id } = req.body
+  const id = req.params.id as string
 
-  await deleteProduct(id)
+  await deleteProductById(id)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Product deleted" })
+})
+
+export const editProductByIdController = asyncHandler(async (req, res) => {
+  const { id, name, description, price, stock, imageUrl } = req.body
+
+  const updateProduct = await editProductById(
+    id,
+    name,
+    description,
+    price,
+    stock,
+    imageUrl,
+  )
+
+  return res
+    .status(HTTP_STATUS.OK)
+    .json({ message: "Updated product", updateProduct })
 })

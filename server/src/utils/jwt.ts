@@ -18,6 +18,7 @@ export const generateRefreshToken = (userId: string) => {
 
 export const verifyToken = (token: string) => {
   try {
+    console.log({ token })
     return jwt.verify(token, secretKey) as JwtPayload
   } catch (err) {
     throw new AppError("Invalid token", HTTP_STATUS.UNAUTHORIZED)

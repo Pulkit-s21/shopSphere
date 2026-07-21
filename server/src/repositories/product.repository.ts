@@ -11,7 +11,7 @@ export const createProduct = async (
   description: string,
   price: number,
   stock: number,
-  imgUrl: string,
+  imageUrl: string,
 ) => {
   return prisma.product.create({
     data: {
@@ -19,7 +19,7 @@ export const createProduct = async (
       description,
       price,
       stock,
-      imgUrl,
+      imageUrl,
     },
   })
 }
@@ -43,6 +43,34 @@ export const deleteProduct = async (id: string) => {
   })
 }
 
-export const getProducts = async () => {
-  return prisma.product.findMany({ where: { deleted: false } })
+export const getProducts = async (page: number, limit: number) => {
+  return prisma.product.findMany({
+    where: { deleted: false },
+    skip: page,
+    take: limit,
+  })
+}
+
+export const updateProduct = async (
+  id: string,
+  name: string,
+  description: string,
+  price: number,
+  stock: number,
+  imageUrl: string,
+) => {
+  return prisma.product.update({
+    where: { id },
+    data: {
+      name,
+      description,
+      price,
+      stock,
+      imageUrl,
+    },
+    omit: {
+      createdAt: true,
+      updatedAt: true,
+    },
+  })
 }

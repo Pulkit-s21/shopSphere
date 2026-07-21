@@ -23,11 +23,11 @@ export const registerUserController = asyncHandler(async (req, res) => {
 export const loginUserController = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  const accessToken = await loginUser(email, password)
+  const token = await loginUser(email, password)
 
-  res.cookie("accessToken", accessToken, accessCookieConfig)
+  res.cookie("accessToken", token.accessToken, accessCookieConfig)
 
-  res.cookie("refreshToken", accessToken, refreshCookieConfig)
+  res.cookie("refreshToken", token.refreshToken, refreshCookieConfig)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Login successful" })
 })
@@ -46,7 +46,7 @@ export const refreshTokenController = asyncHandler(async (req, res) => {
     throw new AppError("Refresh token missing", HTTP_STATUS.NOT_FOUND)
 
   // verify token
-  const decoded = verifyRefreshToken(refreshCookie.refreshToken)
+  const decoded = verifyRefreshToken(refreshCookie)
 
   // generate new token
   const accessToken = generateAccessToken(decoded.userId!)
