@@ -9,12 +9,23 @@ import {
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const getAllProductsController = asyncHandler(async (req, res) => {
-  const { page, limit } = req.query
+  const { page, limit, search, maxPrice, minPrice, sort } = req.query
 
-  const pageNumber = Number(page) || 0
-  const limitNumber = Number(limit) || 0
+  const pageNumber = Number(page) || 1
+  const limitNumber = Number(limit) || 10
+  const maxNumber = Number(maxPrice)
+  const minNumber = Number(minPrice)
+  const sorted = sort! as string
+  const searched = search! as string
 
-  const products = await getAllProducts(pageNumber, limitNumber)
+  const products = await getAllProducts(
+    pageNumber,
+    limitNumber,
+    searched,
+    maxNumber,
+    minNumber,
+    sorted
+  )
 
   return res.status(HTTP_STATUS.OK).json({ message: "All Products", products })
 })

@@ -1,4 +1,8 @@
 import { prisma } from "../config/prisma.js"
+import { HTTP_STATUS } from "../constants/constants.js"
+import { AppError } from "../utils/AppError.js"
+
+const allowedSortFields = ["name", "price", "createdAt"]
 
 export const findByDetails = async (name: string, description: string) => {
   return prisma.product.findFirst({
@@ -43,11 +47,58 @@ export const deleteProduct = async (id: string) => {
   })
 }
 
-export const getProducts = async (page: number, limit: number) => {
+export const getProducts = async (
+  page: number,
+  limit: number,
+  search: string,
+  maxPrice: number,
+  minPrice: number,
+  sort: string,
+) => {
+  const where: any = { deleted: false }
+  const skip = (page - 1) * limit
+  let orderBy: any = undefined
+
+  if (sort) {
+    const field = sort.startsWith("-") ? sort.slice(1) : sort
+
+    if (!allowedSortFields)
+      throw new AppError("Invalid sort field", HTTP_STATUS.BAD_REQUEST)
+
+    const direction = sort.startsWith("-") ? "desc" : "asc"
+
+    orderBy = {
+      [field]: direction,
+    }
+  }
+
+  if (search) {
+    where.name = {
+      contains: search,
+      mode: "insensitive",
+    }
+  }
+
+  if (maxPrice) {
+    where.price = {
+      ...where.price,
+      lte: Number(maxPrice),
+    }
+  }
+
+  if (minPrice) {
+    where.price = {
+      ...where.price,
+      gte: Number(minPrice),
+    }
+  }
+
   return prisma.product.findMany({
-    where: { deleted: false },
-    skip: page,
+    where,
+    skip,
     take: limit,
+    omit: { updatedAt: true },
+    orderBy,
   })
 }
 

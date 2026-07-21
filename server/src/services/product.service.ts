@@ -36,8 +36,15 @@ export const deleteProductById = async (id: string) => {
   return await deleteProduct(id)
 }
 
-export const getAllProducts = async (page: number, limit: number) => {
-  return await getProducts(page, limit)
+export const getAllProducts = async (
+  page: number,
+  limit: number,
+  search: string,
+  maxPrice: number,
+  minPrice: number,
+  sort: string,
+) => {
+  return await getProducts(page, limit, search, maxPrice, minPrice, sort)
 }
 
 export const editProductById = async (
