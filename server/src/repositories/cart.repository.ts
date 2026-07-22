@@ -1,22 +1,41 @@
-import { prisma } from "../config/prisma.js"
+import { prisma, type DbClient } from "../config/prisma.js"
 
-// export const createCart = async (id: string, userId: string, items: string) => {
-//   return prisma.cart.create({
-//     where: { id },
-//     data: {
-//       userId,
-//     },
-//   })
-// }
-
-export const getCart = async (id: string, userId: string) => {
+export const findCartByUserId = async (id: string) => {
   return prisma.cart.findUnique({
-    where: {
-      id,
+    where: { userId: id },
+  })
+}
+
+export const createCart = async (db: DbClient, userId: string) => {
+  return db.cart.create({
+    data: {
       userId,
     },
-    include: {
-      items: true,
+  })
+}
+
+export const addToCart = async (
+  db: DbClient,
+  productId: string,
+  quantity: number,
+  cartId: string,
+) => {
+  return db.cartItem.create({
+    data: {
+      cartId,
+      productId,
+      quantity,
     },
+  })
+}
+
+// export const updateCart = async(cartId: string, productId: string, quantity: string)
+export const findCartItem = async (
+  db: DbClient,
+  cartId: string,
+  productId: string,
+) => {
+  return db.cartItem.findUnique({
+    where: { cartId_productId: { cartId, productId } },
   })
 }
