@@ -13,6 +13,8 @@ model User {
   email       String       @unique
   password    String
 
+  cart        Cart?
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -34,6 +36,8 @@ model Product {
   categoryId  String      
   category    Category    @relation(references: [id], fields: [categoryId], onDelete: Cascade)
 
+  cartItems   CartItems[]
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -44,10 +48,38 @@ model Category {
 
   deleted     Boolean     @default(false)
 
-  total       Int        @default(0)
+  total       Int         @default(0)
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
   products   Product[]
+}
+
+model Cart {
+  id        String        @id @default(cuid())
+
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id])
+
+  items     CartItems[]
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model CartItems {
+  id        String        @id @default(cuid())
+  cartId    String        
+  cart      Cart          @relation(fields: [cartId], references: [id])
+
+  productId String
+  product   Product       @relation(fields: [productId], references: [id])
+
+  quantity  Int
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([cartId,productId]) // there will only ever be one row per product in a cart.
 }
