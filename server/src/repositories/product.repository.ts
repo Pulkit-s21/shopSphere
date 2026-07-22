@@ -1,8 +1,6 @@
-import { prisma } from "../config/prisma.js"
+import { prisma, type DbClient } from "../config/prisma.js"
 import { HTTP_STATUS } from "../constants/constants.js"
 import { AppError } from "../utils/AppError.js"
-
-type Db = typeof prisma
 
 const allowedSortFields = ["name", "price", "createdAt"]
 
@@ -13,7 +11,7 @@ export const findByDetails = async (name: string, description: string) => {
 }
 
 export const createProduct = async (
-  db: Db,
+  db: DbClient,
   name: string,
   description: string,
   price: number,

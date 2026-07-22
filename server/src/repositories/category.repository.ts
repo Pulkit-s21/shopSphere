@@ -1,15 +1,14 @@
-import { prisma } from "../config/prisma.js"
+import { prisma, type DbClient } from "../config/prisma.js"
 
-type Db = typeof prisma
 
-export const findById = async (db: Db, name: string) => {
+export const findById = async (db: DbClient, name: string) => {
   return db.category.findUnique({
     where: { name, deleted: false },
     omit: { updatedAt: true },
   })
 }
 
-export const incrementTotal = async (db: Db, categoryId: string) => {
+export const incrementTotal = async (db: DbClient, categoryId: string) => {
   return db.category.update({
     where: { id: categoryId },
     data: {
@@ -20,7 +19,7 @@ export const incrementTotal = async (db: Db, categoryId: string) => {
   })
 }
 
-export const decrementTotal = async (db: Db, categoryId: string) => {
+export const decrementTotal = async (db: DbClient, categoryId: string) => {
   return db.category.update({
     where: { id: categoryId },
     data: {
