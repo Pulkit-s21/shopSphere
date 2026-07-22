@@ -2,6 +2,8 @@ import { prisma } from "../config/prisma.js"
 import { HTTP_STATUS } from "../constants/constants.js"
 import { AppError } from "../utils/AppError.js"
 
+type Db = typeof prisma
+
 const allowedSortFields = ["name", "price", "createdAt"]
 
 export const findByDetails = async (name: string, description: string) => {
@@ -11,20 +13,24 @@ export const findByDetails = async (name: string, description: string) => {
 }
 
 export const createProduct = async (
+  db: Db,
   name: string,
   description: string,
   price: number,
   stock: number,
   imageUrl: string,
+  categoryId: string,
 ) => {
-  return prisma.product.create({
+  return db.product.create({
     data: {
       name,
       description,
       price,
       stock,
       imageUrl,
+      categoryId,
     },
+    include: { category: true },
   })
 }
 
@@ -109,6 +115,7 @@ export const updateProduct = async (
   price: number,
   stock: number,
   imageUrl: string,
+  categoryId: string,
 ) => {
   return prisma.product.update({
     where: { id },
@@ -118,6 +125,7 @@ export const updateProduct = async (
       price,
       stock,
       imageUrl,
+      categoryId,
     },
     omit: {
       createdAt: true,

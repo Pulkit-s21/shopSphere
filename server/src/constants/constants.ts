@@ -30,3 +30,12 @@ export const refreshCookieConfig: CookieOptions = {
   sameSite: "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 }
+
+export type GetProductsOptions = {
+  page: number
+  limit: number
+  search?: string
+  minPrice?: number
+  maxPrice?: number
+  sort?: string
+}

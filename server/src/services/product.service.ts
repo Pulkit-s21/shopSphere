@@ -1,3 +1,4 @@
+import { prisma } from "../config/prisma.js"
 import { HTTP_STATUS } from "../constants/constants.js"
 import {
   createProduct,
@@ -7,6 +8,11 @@ import {
   getProducts,
   updateProduct,
 } from "../repositories/product.repository.js"
+import {
+  decrementTotal,
+  findById as findCategory,
+  incrementTotal,
+} from "../repositories/category.repository.js"
 import { AppError } from "../utils/AppError.js"
 
 export const addProduct = async (
@@ -15,13 +21,34 @@ export const addProduct = async (
   price: number,
   stock: number,
   imageUrl: string,
+  category: string,
 ) => {
-  const existingProduct = await findByDetails(name, description)
+  return prisma.$transaction(async (tx) => {
+    const cat = await findCategory(tx, category)
 
-  if (existingProduct)
-    throw new AppError("Product already exists", HTTP_STATUS.CONFLICT)
+    if (!cat) {
+      throw new AppError("Category not found", HTTP_STATUS.NOT_FOUND)
+    }
 
-  return await createProduct(name, description, price, stock, imageUrl)
+    const existingProduct = await findByDetails(name, description)
+
+    if (existingProduct)
+      throw new AppError("Product already exists", HTTP_STATUS.CONFLICT)
+
+    const product = await createProduct(
+      tx,
+      name,
+      description,
+      price,
+      stock,
+      imageUrl,
+      cat.id,
+    )
+
+    await incrementTotal(tx, cat.id)
+
+    return { product }
+  })
 }
 
 export const getProductById = async (id: string) => {
@@ -33,7 +60,8 @@ export const deleteProductById = async (id: string) => {
 
   if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
 
-  return await deleteProduct(id)
+  await deleteProduct(id)
+  await decrementTotal(prisma, product.categoryId)
 }
 
 export const getAllProducts = async (
@@ -54,11 +82,26 @@ export const editProductById = async (
   price: number,
   stock: number,
   imageUrl: string,
+  category: string,
 ) => {
   const existingProduct = await findById(id)
 
   if (!existingProduct)
     throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
 
-  return await updateProduct(id, name, description, price, stock, imageUrl)
+  const cat = await findCategory(prisma, category)
+
+  if (!cat) {
+    throw new AppError("Category not found", HTTP_STATUS.NOT_FOUND)
+  }
+
+  return await updateProduct(
+    id,
+    name,
+    description,
+    price,
+    stock,
+    imageUrl,
+    cat.id,
+  )
 }

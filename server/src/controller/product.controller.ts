@@ -24,7 +24,7 @@ export const getAllProductsController = asyncHandler(async (req, res) => {
     searched,
     maxNumber,
     minNumber,
-    sorted
+    sorted,
   )
 
   return res.status(HTTP_STATUS.OK).json({ message: "All Products", products })
@@ -39,11 +39,20 @@ export const getProductByIdController = asyncHandler(async (req, res) => {
 })
 
 export const addProductController = asyncHandler(async (req, res) => {
-  const { name, description, price, stock, imageUrl } = req.body
+  const { name, description, price, stock, imageUrl, category } = req.body
 
-  await addProduct(name, description, price, stock, imageUrl)
+  const { product } = await addProduct(
+    name,
+    description,
+    price,
+    stock,
+    imageUrl,
+    category,
+  )
 
-  return res.status(HTTP_STATUS.CREATED).json({ message: "Product created" })
+  return res
+    .status(HTTP_STATUS.CREATED)
+    .json({ message: "Product created", product })
 })
 
 export const deleteProductByIdController = asyncHandler(async (req, res) => {
@@ -55,7 +64,8 @@ export const deleteProductByIdController = asyncHandler(async (req, res) => {
 })
 
 export const editProductByIdController = asyncHandler(async (req, res) => {
-  const { id, name, description, price, stock, imageUrl } = req.body
+  const id = req.params.id as string
+  const { name, description, price, stock, imageUrl, category } = req.body
 
   const updateProduct = await editProductById(
     id,
@@ -64,6 +74,7 @@ export const editProductByIdController = asyncHandler(async (req, res) => {
     price,
     stock,
     imageUrl,
+    category,
   )
 
   return res
