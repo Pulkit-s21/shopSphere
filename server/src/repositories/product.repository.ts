@@ -32,8 +32,8 @@ export const createProduct = async (
   })
 }
 
-export const findById = async (id: string) => {
-  return prisma.product.findUnique({
+export const findById = async (db: DbClient, id: string) => {
+  return db.product.findUnique({
     where: { id, deleted: false },
     omit: {
       createdAt: true,
@@ -128,6 +128,21 @@ export const updateProduct = async (
     omit: {
       createdAt: true,
       updatedAt: true,
+    },
+  })
+}
+
+export const decrementStock = async (
+  db: DbClient,
+  productId: string,
+  quantity: number,
+) => {
+  return db.product.update({
+    where: { id: productId },
+    data: {
+      stock: {
+        decrement: quantity,
+      },
     },
   })
 }

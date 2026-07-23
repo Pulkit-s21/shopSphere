@@ -1,10 +1,10 @@
 import { HTTP_STATUS } from "../constants/constants.js"
-import { deleteCategory } from "../repositories/category.repository.js"
 import {
   addCategory,
-  editCategory,
+  deleteCategoryById,
+  editCategoryById,
   getAllCategoryies,
-  getCateogry,
+  getCateogryById,
 } from "../services/category.service.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
@@ -19,7 +19,7 @@ export const addCategoryController = asyncHandler(async (req, res) => {
 export const deleteCategoryController = asyncHandler(async (req, res) => {
   const id = req.params.id as string
 
-  await deleteCategory(id)
+  await deleteCategoryById(id)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Category deleted" })
 })
@@ -28,7 +28,7 @@ export const editCategoryController = asyncHandler(async (req, res) => {
   const id = req.params.id as string
   const { name } = req.body
 
-  const updatedCategory = await editCategory(id, name)
+  const updatedCategory = await editCategoryById(id, name)
 
   return res
     .status(HTTP_STATUS.OK)
@@ -46,7 +46,7 @@ export const getAllCategoryiesController = asyncHandler(async (req, res) => {
 export const getCateogryController = asyncHandler(async (req, res) => {
   const id = req.params.id as string
 
-  const category = await getCateogry(id)
+  const category = await getCateogryById(id)
 
   return res.status(HTTP_STATUS.OK).json({ message: "Cateogry", category })
 })

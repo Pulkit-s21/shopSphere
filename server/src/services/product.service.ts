@@ -52,11 +52,11 @@ export const addProduct = async (
 }
 
 export const getProductById = async (id: string) => {
-  return await findById(id)
+  return await findById(prisma, id)
 }
 
 export const deleteProductById = async (id: string) => {
-  const product = await findById(id)
+  const product = await findById(prisma, id)
 
   if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
 
@@ -84,7 +84,7 @@ export const editProductById = async (
   imageUrl: string,
   category: string,
 ) => {
-  const existingProduct = await findById(id)
+  const existingProduct = await findById(prisma, id)
 
   if (!existingProduct)
     throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)

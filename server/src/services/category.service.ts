@@ -1,3 +1,4 @@
+import { prisma } from "../config/prisma.js"
 import { HTTP_STATUS } from "../constants/constants.js"
 import {
   createCategory,
@@ -13,15 +14,15 @@ export const addCategory = async (name: string) => {
 }
 
 export const deleteCategoryById = async (id: string) => {
-  const category = await findById(id)
+  const category = await findById(prisma, id)
 
   if (!category) throw new AppError("Category not found", HTTP_STATUS.NOT_FOUND)
 
   return await deleteCategory(id)
 }
 
-export const editCategory = async (id: string, name: string) => {
-  const category = await findById(id)
+export const editCategoryById = async (id: string, name: string) => {
+  const category = await findById(prisma, id)
 
   if (!category) throw new AppError("Category not found", HTTP_STATUS.NOT_FOUND)
 
@@ -32,6 +33,6 @@ export const getAllCategoryies = async () => {
   return getCategories()
 }
 
-export const getCateogry = async (id: string) => {
-  return await findById(id)
+export const getCateogryById = async (id: string) => {
+  return await findById(prisma, id)
 }

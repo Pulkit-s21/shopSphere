@@ -1,8 +1,9 @@
-import { prisma, type DbClient } from "../config/prisma.js"
+import type { DbClient } from "../config/prisma.js"
 
-export const findCartByUserId = async (id: string) => {
-  return prisma.cart.findUnique({
+export const findCartByUserId = async (db: DbClient, id: string) => {
+  return db.cart.findUnique({
     where: { userId: id },
+    omit: { updatedAt: true },
   })
 }
 
@@ -11,20 +12,26 @@ export const createCart = async (db: DbClient, userId: string) => {
     data: {
       userId,
     },
+    omit: {
+      updatedAt: true,
+    },
   })
 }
 
 export const addToCart = async (
   db: DbClient,
+  cartId: string,
   productId: string,
   quantity: number,
-  cartId: string,
 ) => {
   return db.cartItem.create({
     data: {
       cartId,
       productId,
       quantity,
+    },
+    omit: {
+      updatedAt: true,
     },
   })
 }
@@ -37,5 +44,37 @@ export const findCartItem = async (
 ) => {
   return db.cartItem.findUnique({
     where: { cartId_productId: { cartId, productId } },
+    omit: { updatedAt: true },
+  })
+}
+
+export const incrementQuantity = async (
+  db: DbClient,
+  cartId: string,
+  productId: string,
+  quantity: number,
+) => {
+  return db.cartItem.update({
+    where: { cartId_productId: { cartId, productId } },
+    data: {
+      quantity: {
+        increment: quantity,
+      },
+    },
+  })
+}
+
+export const decrementQuantity = async (
+  db: DbClient,
+  cartId: string,
+  productId: string,
+) => {
+  return db.cartItem.update({
+    where: { cartId_productId: { cartId, productId } },
+    data: {
+      quantity: {
+        decrement: 1,
+      },
+    },
   })
 }
