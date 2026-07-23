@@ -7,6 +7,13 @@ export const findCartByUserId = async (db: DbClient, id: string) => {
   })
 }
 
+export const getCartWithItems = async (db: DbClient, id: string) => {
+  return db.cart.findUnique({
+    where: { userId: id },
+    include: { items: { include: { product: true } } },
+  })
+}
+
 export const createCart = async (db: DbClient, userId: string) => {
   return db.cart.create({
     data: {
@@ -36,7 +43,6 @@ export const addToCart = async (
   })
 }
 
-// export const updateCart = async(cartId: string, productId: string, quantity: string)
 export const findCartItem = async (
   db: DbClient,
   cartId: string,
@@ -75,6 +81,34 @@ export const decrementQuantity = async (
       quantity: {
         decrement: 1,
       },
+    },
+  })
+}
+
+export const deleteCart = async (db: DbClient, id: string) => {
+  return db.cart.delete({ where: { id } })
+}
+
+export const deleteCartItem = async (
+  db: DbClient,
+  cartId: string,
+  productId: string,
+) => {
+  return db.cartItem.delete({
+    where: { cartId_productId: { cartId, productId } },
+  })
+}
+
+export const updateCartItem = async (
+  db: DbClient,
+  cartId: string,
+  productId: string,
+  quantity: number,
+) => {
+  return db.cartItem.update({
+    where: { cartId_productId: { cartId, productId } },
+    data: {
+      quantity,
     },
   })
 }

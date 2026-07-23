@@ -3,9 +3,13 @@ import { HTTP_STATUS } from "../constants/constants.js"
 import {
   addToCart,
   createCart,
+  deleteCart,
+  deleteCartItem,
   findCartByUserId,
   findCartItem,
+  getCartWithItems,
   incrementQuantity,
+  updateCartItem,
 } from "../repositories/cart.repository.js"
 import {
   decrementStock,
@@ -62,5 +66,55 @@ export const addItemToCart = async (
 
       return increment
     }
+  })
+}
+
+export const clearCart = async (userId: string) => {
+  const cart = await findCartByUserId(prisma, userId)
+
+  if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
+
+  return await deleteCart(prisma, cart.id)
+}
+
+export const removeCartItem = async (userId: string, productId: string) => {
+  const cart = await findCartByUserId(prisma, userId)
+
+  if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
+
+  const product = await findProduct(prisma, productId)
+
+  if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
+
+  return await deleteCartItem(prisma, cart.id, productId)
+}
+
+export const getCartById = async (userId: string) => {
+  return await getCartWithItems(prisma, userId)
+}
+
+export const editCartItem = async (
+  userId: string,
+  productId: string,
+  quantity: number,
+) => {
+  return prisma.$transaction(async (tx) => {
+    const product = await findProduct(tx, productId)
+
+    if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
+
+    const cart = await findCartByUserId(tx, userId)
+
+    if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
+
+    const cartItem = await findCartItem(tx, cart.id, productId)
+
+    if (!cartItem)
+      throw new AppError("Insufficient quantity", HTTP_STATUS.NOT_FOUND)
+
+    if (quantity > product.stock)
+      throw new AppError("Insufficient quantity", HTTP_STATUS.NOT_FOUND)
+
+    return await updateCartItem(tx, cart.id, productId, quantity)
   })
 }
