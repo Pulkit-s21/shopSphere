@@ -39,3 +39,10 @@ export type GetProductsOptions = {
   maxPrice?: number
   sort?: string
 }
+
+export type OrderStatus =
+  | "PENDING"
+  | "PAID"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED"
