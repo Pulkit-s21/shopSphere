@@ -1,9 +1,13 @@
 import { Router } from "express"
 import { authMiddleware } from "../middleware/auth.middleware.js"
-import { checkoutController } from "../controller/order.controller.js"
+import {
+  checkoutController,
+  getOrdersByUserController,
+} from "../controller/order.controller.js"
 
 const router = Router()
 
-router.post("/", authMiddleware, checkoutController)
+router.get("/", authMiddleware, getOrdersByUserController)
+router.post("/checkout", authMiddleware, checkoutController)
 
 export default router

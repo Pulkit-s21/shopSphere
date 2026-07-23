@@ -1,7 +1,15 @@
 import { prisma } from "../config/prisma.js"
 import { HTTP_STATUS } from "../constants/constants.js"
-import { getCartWithItems } from "../repositories/cart.repository.js"
-import { createOrder } from "../repositories/order.repository.js"
+import {
+  deleteCart,
+  getCartWithItems,
+} from "../repositories/cart.repository.js"
+import {
+  createOrder,
+  createOrderItem,
+  findOrderByUser,
+} from "../repositories/order.repository.js"
+import { decrementStock } from "../repositories/product.repository.js"
 import { AppError } from "../utils/AppError.js"
 
 export const checkout = async (userId: string) => {
@@ -21,6 +29,26 @@ export const checkout = async (userId: string) => {
       totalPrice += Number(item.product.price) * item.quantity
     }
 
-    return await createOrder(tx, userId, totalItems, totalPrice)
+    let order = await createOrder(tx, userId, totalItems, totalPrice)
+
+    for (const item of cart.items) {
+      await createOrderItem(
+        tx,
+        order!.id,
+        item.product.id,
+        item.quantity,
+        Number(item.product.price),
+      )
+
+      await decrementStock(tx, item.product.id, item.quantity)
+    }
+
+    await deleteCart(tx, cart.id)
+
+    return order
   })
+}
+
+export const getOrderByUser = async (userId: string) => {
+  return await findOrderByUser(prisma, userId)
 }

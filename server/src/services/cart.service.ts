@@ -11,10 +11,7 @@ import {
   incrementQuantity,
   updateCartItem,
 } from "../repositories/cart.repository.js"
-import {
-  decrementStock,
-  findById as findProduct,
-} from "../repositories/product.repository.js"
+import { findById as findProduct } from "../repositories/product.repository.js"
 import { AppError } from "../utils/AppError.js"
 
 export const addItemToCart = async (
@@ -45,7 +42,6 @@ export const addItemToCart = async (
       }
 
       const added = await addToCart(tx, cart.id, productId, quantity)
-      // await decrementStock(tx, productId, quantity)
 
       return added
     }
@@ -62,7 +58,6 @@ export const addItemToCart = async (
         productId,
         quantity,
       )
-      // await decrementStock(tx, productId, quantity)
 
       return increment
     }
@@ -70,23 +65,27 @@ export const addItemToCart = async (
 }
 
 export const clearCart = async (userId: string) => {
-  const cart = await findCartByUserId(prisma, userId)
+  return prisma.$transaction(async (tx) => {
+    const cart = await findCartByUserId(tx, userId)
 
-  if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
+    if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
 
-  return await deleteCart(prisma, cart.id)
+    return await deleteCart(tx, cart.id)
+  })
 }
 
 export const removeCartItem = async (userId: string, productId: string) => {
-  const cart = await findCartByUserId(prisma, userId)
+  return prisma.$transaction(async (tx) => {
+    const cart = await findCartByUserId(tx, userId)
 
-  if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
+    if (!cart) throw new AppError("Cart not found", HTTP_STATUS.NOT_FOUND)
 
-  const product = await findProduct(prisma, productId)
+    const product = await findProduct(tx, productId)
 
-  if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
+    if (!product) throw new AppError("Product not found", HTTP_STATUS.NOT_FOUND)
 
-  return await deleteCartItem(prisma, cart.id, productId)
+    return await deleteCartItem(tx, cart.id, productId)
+  })
 }
 
 export const getCartById = async (userId: string) => {

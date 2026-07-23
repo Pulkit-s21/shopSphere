@@ -78,21 +78,6 @@ export const incrementQuantity = async (
   })
 }
 
-export const decrementQuantity = async (
-  db: DbClient,
-  cartId: string,
-  productId: string,
-) => {
-  return db.cartItem.update({
-    where: { cartId_productId: { cartId, productId } },
-    data: {
-      quantity: {
-        decrement: 1,
-      },
-    },
-  })
-}
-
 export const deleteCart = async (db: DbClient, id: string) => {
   return db.cart.delete({ where: { id } })
 }

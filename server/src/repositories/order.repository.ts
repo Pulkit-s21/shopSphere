@@ -20,7 +20,7 @@ export const createOrder = async (
   })
 }
 
-export const addOrderItem = async (
+export const createOrderItem = async (
   db: DbClient,
   orderId: string,
   productId: string,
@@ -38,7 +38,7 @@ export const addOrderItem = async (
 }
 
 export const findOrderByUser = async (db: DbClient, userId: string) => {
-  return db.order.findMany({ where: { userId } })
+  return db.order.findMany({ where: { userId }, omit: { createdAt: true } })
 }
 
 export const updateOrderStatus = async (
