@@ -15,6 +15,8 @@ model User {
 
   cart        Cart?
 
+  order       Order?
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -37,6 +39,8 @@ model Product {
   category    Category    @relation(references: [id], fields: [categoryId], onDelete: Cascade)
 
   cartItems   CartItem[]
+
+  orderItems  OrderItem[]
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -78,8 +82,47 @@ model CartItem {
 
   quantity  Int
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@unique([cartId,productId]) // there will only ever be one row per product in a cart.
+}
+
+model Order {
+  id          String        @id @default(cuid())
+
+  userId      String        @unique
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status      OrderStatus   @default(PENDING)
+
+  totalItems  Int
+  totalPrice  Decimal       @db.Decimal(10,2)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items       OrderItem[]
+
+}
+
+model OrderItem {
+  id        String        @id @default(cuid())
+  orderId   String        
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  quantity  Int
+
+  price     Decimal      @db.Decimal(10,2)
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
