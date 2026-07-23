@@ -5,7 +5,7 @@ export const findOrderById = async (db: DbClient, id: string) => {
   return db.order.findUnique({ where: { id }, omit: { updatedAt: true } })
 }
 
-export const addOrder = async (
+export const createOrder = async (
   db: DbClient,
   userId: string,
   totalItems: number,
@@ -26,7 +26,6 @@ export const addOrderItem = async (
   productId: string,
   quantity: number,
   price: number,
-  status: OrderStatus,
 ) => {
   return db.orderItem.create({
     data: {
@@ -34,7 +33,6 @@ export const addOrderItem = async (
       productId,
       quantity,
       price,
-      status,
     },
   })
 }

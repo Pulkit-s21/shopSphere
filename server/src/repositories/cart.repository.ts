@@ -10,7 +10,15 @@ export const findCartByUserId = async (db: DbClient, id: string) => {
 export const getCartWithItems = async (db: DbClient, id: string) => {
   return db.cart.findUnique({
     where: { userId: id },
-    include: { items: { include: { product: true } } },
+    include: {
+      items: {
+        include: {
+          product: { omit: { deleted: true, createdAt: true, stock: true } },
+        },
+        omit: { id: true, cartId: true, createdAt: true, productId: true },
+      },
+    },
+    omit: { createdAt: true },
   })
 }
 

@@ -103,7 +103,6 @@ model Order {
   updatedAt   DateTime      @updatedAt
 
   items       OrderItem[]
-
 }
 
 model OrderItem {
