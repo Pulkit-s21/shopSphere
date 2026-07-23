@@ -41,7 +41,7 @@ export const addItemToCart = async (
       }
 
       const added = await addToCart(tx, cart.id, productId, quantity)
-      await decrementStock(tx, productId, quantity)
+      // await decrementStock(tx, productId, quantity)
 
       return added
     }
@@ -58,7 +58,7 @@ export const addItemToCart = async (
         productId,
         quantity,
       )
-      await decrementStock(tx, productId, quantity)
+      // await decrementStock(tx, productId, quantity)
 
       return increment
     }
