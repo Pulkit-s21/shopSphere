@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma.js"
-import { HTTP_STATUS } from "../constants/constants.js"
+import { HTTP_STATUS, type OrderStatus } from "../constants/constants.js"
 import {
   deleteCart,
   getCartWithItems,
@@ -7,7 +7,9 @@ import {
 import {
   createOrder,
   createOrderItem,
+  findOrderById,
   findOrderByUser,
+  updateOrderStatus,
 } from "../repositories/order.repository.js"
 import { decrementStock } from "../repositories/product.repository.js"
 import { AppError } from "../utils/AppError.js"
@@ -51,4 +53,50 @@ export const checkout = async (userId: string) => {
 
 export const getOrderByUser = async (userId: string) => {
   return await findOrderByUser(prisma, userId)
+}
+
+export const getOrderById = async (orderId: string) => {
+  return await findOrderById(prisma, orderId)
+}
+
+export const cancelOrderById = async (id: string, status: OrderStatus) => {
+  return prisma.$transaction(async (tx) => {
+    if (status !== "CANCELLED")
+      throw new AppError("Order status is incorrect", HTTP_STATUS.BAD_REQUEST)
+
+    const order = await findOrderById(tx, id)
+
+    if (!order) throw new AppError("Order not found", HTTP_STATUS.NOT_FOUND)
+
+    const orderStatus = order.status
+
+    if (orderStatus === "CANCELLED")
+      throw new AppError(
+        "Order has already been cancelled",
+        HTTP_STATUS.BAD_REQUEST,
+      )
+
+    if (orderStatus !== "PENDING")
+      throw new AppError("Order cannot be cancelled", HTTP_STATUS.BAD_REQUEST)
+
+    return await updateOrderStatus(tx, id, status)
+  })
+}
+
+export const editOrderStatusById = async (id: string, status: OrderStatus) => {
+  return prisma.$transaction(async (tx) => {
+    const order = await findOrderById(tx, id)
+
+    if (!order) throw new AppError("Order not found", HTTP_STATUS.NOT_FOUND)
+
+    const orderStatus = order.status
+
+    if (orderStatus === "CANCELLED")
+      throw new AppError(
+        "Order has already been cancelled",
+        HTTP_STATUS.BAD_REQUEST,
+      )
+
+    return await updateOrderStatus(tx, id, status)
+  })
 }

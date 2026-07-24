@@ -1,4 +1,4 @@
-import { prisma, type DbClient } from "../config/prisma.js"
+import { type DbClient } from "../config/prisma.js"
 import type { OrderStatus } from "../constants/constants.js"
 
 export const findOrderById = async (db: DbClient, id: string) => {
