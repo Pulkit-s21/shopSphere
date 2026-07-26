@@ -1,7 +1,14 @@
 import api from "../lib/axios"
+import { SignUpInput } from "../schemas/registerSchema"
 
-export const register = async (data: any) => {
-  const res = await api.post("/auth/register", data)
+export const register = async (data: SignUpInput) => {
+  const payload = {
+    name: `${data.firstName} ${data.lastName}`,
+    email: data.email,
+    password: data.password,
+  }
+
+  const res = await api.post("/auth/register", payload)
   return res.data
 }
 
